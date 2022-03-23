@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:messenger/domain/Chat.dart';
 import 'package:messenger/provider/Messages.dart';
@@ -19,8 +21,15 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   void initState() {
-    _futureMessages =
-        Provider.of<Messages>(context, listen: false).loadMessages(widget.chat.id!);
+    _futureMessages = Provider.of<Messages>(context, listen: false)
+        .loadMessages(widget.chat.id!);
+    /*Timer.periodic(Duration(seconds: 5), (timer) {
+      _futureMessages = Provider.of<Messages>(context, listen: false)
+          .loadMessages(widget.chat.id!);
+      print('test2');
+    });
+
+     */
   }
 
   @override
@@ -34,13 +43,13 @@ class _MessagesPageState extends State<MessagesPage> {
           future: _futureMessages,
           builder: (_, snapshot) {
             return snapshot.connectionState == ConnectionState.waiting
-                ?  Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : ListView.builder(
                     shrinkWrap: true,
                     itemCount: messages.all.length,
                     itemBuilder: (_, index) {
                       return ListTile(
-                        title: Text(messages.all[index].text),
+                        title: Text(messages.all[index].content),
                         subtitle: Text(messages.all[index].id!),
                       );
                     });
@@ -55,7 +64,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 icon: Icon(Icons.add),
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    //  chats.addChat(_controller.text);
+                    messages.addMessage(_controller.text, widget.chat.id!);
                     _controller.clear();
                   }
                 }),

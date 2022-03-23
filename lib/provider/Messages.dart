@@ -24,13 +24,12 @@ class Messages with ChangeNotifier{
         (entry.value, entry.key)).toList();
     }catch (error){
       print(error);
-      print('Df');
     }
   }
 
-  Future<void> addMessage(String text) async {
-    final url = Uri.parse('$baseUrl/chats.json');
-    final message = Message(text: text);
+  Future<void> addMessage(String content, String chatId) async {
+    final url = Uri.parse('$baseUrl/chats/$chatId/messages.json');
+    final message = Message(content: content);
     final body = jsonEncode(message.toJson());
     try{
       final response = await http.post(url,body: body);
