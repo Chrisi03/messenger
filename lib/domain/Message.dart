@@ -15,4 +15,15 @@ class Message {
       'content': content
     };
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Message &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          content == other.content;
+
+  @override
+  int get hashCode => id.hashCode ^ content.hashCode;
 }

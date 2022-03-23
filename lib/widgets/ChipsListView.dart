@@ -16,15 +16,23 @@ class ChipsListView extends StatefulWidget {
 
 class _ChipsListViewState extends State<ChipsListView> {
   late Future _futureChats;
-  var chatLenght;
+  late Timer timer;
 
   @override
   void initState() {
+    //Provider.of<Chats>(context,listen: true);
     _futureChats = Provider.of<Chats>(context, listen: false).loadChats();
 
-    Timer.periodic(Duration(seconds: 5), (_) {
+    timer = Timer.periodic(Duration(seconds: 5), (_) {
+      print('test');
       _futureChats = Provider.of<Chats>(context, listen: false).loadChats();
     });
+  }
+
+
+  @override
+  void dispose() {
+    timer.cancel();
   }
 
   @override
@@ -41,28 +49,31 @@ class _ChipsListViewState extends State<ChipsListView> {
                 shrinkWrap: true,
                 itemCount: chats.all.length,
                 itemBuilder: (_, index) {
-                  print('test');
                   return ActionChip(
                       avatar: CircleAvatar(
                           backgroundColor: Colors.grey.shade800,
-                          child: getChatLength(chats.all[index])),
+                          child: chats.all[index].messages == null
+                              ? Text('0')
+                              :Text(chats.all[index].messages!.length.toString())
+                      ),
                       label: Text(chats.all[index].title),
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        await Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    MessagesPage(chats.all[index])));
+                                    MessagesPage(index)));
+
                       });
                 });
       },
     );
   }
-
+/*
   FutureBuilder getChatLength(Chat chat) {
     print(chat.id);
     final messages = Provider.of<Messages>(context);
-    late Future _futureMessages =
+    Future _futureMessages =
         Provider.of<Messages>(context, listen: false).loadMessages(chat.id!);
   return FutureBuilder(
         future: _futureMessages,
@@ -72,4 +83,6 @@ class _ChipsListViewState extends State<ChipsListView> {
               : Text(messages.all.length.toString());
         });
   }
+
+ */
 }

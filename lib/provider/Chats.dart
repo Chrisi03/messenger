@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:messenger/domain/Chat.dart';
 import 'package:http/http.dart' as http;
+import 'package:messenger/domain/Message.dart';
 
 class Chats with ChangeNotifier{
   var _values = <Chat>[
@@ -17,16 +20,22 @@ class Chats with ChangeNotifier{
   }
 
   Future<void> loadChats() async {
+
     final url = Uri.parse('$baseUrl/chats.json');
     try{
       final response = await http.get(url);
       final data = jsonDecode(response.body);
-      _values = data.entries.map<Chat>((entry) => Chat.fromJson
-        (entry.value, entry.key)).toList();
+      final serverValues = data.entries.map<Chat>((entry) => Chat.fromJson(entry.value, entry.key)).toList();
+      if (!listEquals(_values, serverValues)) {
+        _values = serverValues;
+        notifyListeners();
+      }
     }catch (error){
       print(error);
     }
   }
+
+
 
   Future<void> addChat(String title) async {
     final url = Uri.parse('$baseUrl/chats.json');
